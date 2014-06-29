@@ -7,7 +7,6 @@
 
 #include <TF1.h>
 #include <TMath.h>
-#include <HTransformToCS.c>
 #include <TMatrixF.h>
 #include <TVectorF.h>
 
@@ -40,19 +39,24 @@ TFile* SUSYLooperHists::Loop()
 
    if (fChain == 0) return NULL;
    Long64_t nentries = fChain->GetEntriesFast();
-   HTransformToCS mtCS;
-   mtCS.SetCmsEnergy(8000);
-
-
+  
    TFile* myFile = new TFile(outputFileName,"recreate");
+   // checks the Mtt mass ++ simple plot example ++
    TH1D* LepTwoZmass= new TH1D("LepTwoZmass",";approximate Z(#tau#tau) mass [GeV];",100,0,2000);
+   LepTwoZmass->Sumw2();
+
+   // baseline plots +++++++++++++++++++++
+   // allow to fill cutflow to sychronize to others
+   TH1D* CutFlow = new TH1D("CutFlow",";CutFlow [unweighted];",20,-0.5,19.5);
+   CutFlow->Sumw2();
+
+ // a scan should be filled without weights before any cut to get the efficiency. The reason is that for a scan each points have different x-section, which are not accessable during the loop
    TH2D* scan = new TH2D("scan","scan",8,112.5,312.5,40,112.5,312.5);
+   // fill after some cuts the scans to get efficiency, i.e. ->Divide(scan) after the loop
    TH2D* scanA = new TH2D("scanA","scan",8,112.5,312.5,40,112.5,312.5);
    TH2D* scanB = new TH2D("scanB","scan",8,112.5,312.5,40,112.5,312.5);
    TH2D* scanC = new TH2D("scanC","scan",8,112.5,312.5,40,112.5,312.5);
-   // baseline plots +++++++++++++++++++++
-   TH1D* CutFlowAntonis = new TH1D("CutFlowAntonis",";P(l);",20,-0.5,19.5);
-   CutFlowAntonis->Sumw2();
+
 
    Long64_t nbytes = 0, nb = 0;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
@@ -61,7 +65,7 @@ TFile* SUSYLooperHists::Loop()
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
 
-      if(jentry%10000==0) cout << "Event: "<<jentry <<" weight: " << weight  <<endl;
+      if(jentry%100000==0) cout << "Event: "<<jentry <<endl;
       scan->Fill(GenSusyMStop,GenSusyMNeutralino);
       // select lepton and put it into TLorentzvector 
 
@@ -109,28 +113,28 @@ TFile* SUSYLooperHists::Loop()
 
       // preselection syncronizd to Antonis ++++++++++++++++++++
       if( nLepGood == 0  ) continue;
-      CutFlowAntonis->Fill(0.);
+      CutFlow->Fill(0.);
       if(met.Pt()<200) continue;
       if(nLepGood<2)  continue;
       if(nJet==0)  continue;
       if(nTauGood!=0)  continue;
-      CutFlowAntonis->Fill(1.);
+      CutFlow->Fill(1.);
       if(fabs(LepGood_pdgId[0]* LepGood_pdgId[1])<122)   continue;
-      CutFlowAntonis->Fill(2.);
+      CutFlow->Fill(2.);
       if(lep.Pt()<5||fabs(lep.Eta())>1.5||lep.Pt()>60) continue;
-      CutFlowAntonis->Fill(3.);
+      CutFlow->Fill(3.);
       if(fabs(LepGood_pdgId[0])==11&&lep.Pt()<7) continue;
-      CutFlowAntonis->Fill(4.);
+      CutFlow->Fill(4.);
       // check that a cut was ahead in nLepton !!!!!!!!
       TLorentzVector secondLep;
       secondLep.SetPtEtaPhiM(LepGood_pt[1], LepGood_eta[1], LepGood_phi[1],0.1);
       if(secondLep.Pt()<3||fabs(secondLep.Eta())>1.5||secondLep.Pt()>60) continue;
-      CutFlowAntonis->Fill(5.);
+      CutFlow->Fill(5.);
       // lepton cuts
       if(LepGood_relIso[0]*lep.Pt()>10.) continue;
       if(LepGood_relIso[1]*secondLep.Pt()>5.) continue;
       if(LepGood_relIso[1]>.5) continue;
-      CutFlowAntonis->Fill(6.);
+      CutFlow->Fill(6.);
       // JET CUTS
       if(nJet>0){
 	if (Jet_pt[0] < 150) continue;
@@ -139,28 +143,30 @@ TFile* SUSYLooperHists::Loop()
       if(nJet>2){
 	if (Jet_pt[2] > 60) continue;
       }
-      CutFlowAntonis->Fill(7.);
+      CutFlow->Fill(7.);
       if(met.Pt()/HT30<2./3.) continue;
       if(nb40!=0) continue;    
-      CutFlowAntonis->Fill(9.);
-    // preselection syncronizd to Antonis ++++++++++++++++++++
+      CutFlow->Fill(9.);
+    // preselection syncronizd to  ++++++++++++++++++++
 
       if(MT>60&&MT<100) continue;
  
 
       float pairmass = DiTau_InvMass(met,lep,secondLep,0);     
       if(lep.Pt()>25||secondLep.Pt()>15) continue;
+ 
+      // define some over and underflow 
       if (pairmass>2000) pairmass=1999.;
       if (pairmass<0) pairmass=0.;
 
-      LepTwoZmass->Fill(pairmass,weight);
+      LepTwoZmass->Fill(pairmass,weight*puWeight);
 
 
 	if((LepGood_pdgId[0]* LepGood_pdgId[1]<-121))
 	  {
 	 
 	    if(pairmass>160||pairmass<20){
-	      CutFlowAntonis->Fill(10., weight*puWeight);
+	      CutFlow->Fill(10., weight*puWeight);
 	      scanB->Fill(GenSusyMStop,GenSusyMNeutralino);
 	    
 	      if(nb30L==0)
@@ -191,7 +197,7 @@ TFile* SUSYLooperHists::Loop()
    scanB->Divide(scan);
    scanC->Divide(scan);
 
-   CutFlowAntonis->DrawCopy();
+   CutFlow->DrawCopy();
 
    myFile->Write();
    return (myFile);
