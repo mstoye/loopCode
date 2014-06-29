@@ -262,15 +262,14 @@ public :
 SUSYLooperHists::SUSYLooperHists(SampleInfo mySample, float Mstop_ , float MLSP_ )
 {
 
-  TFile *f = new TFile(mySample.SamplePath);
+  TFile *f = TFile::Open(mySample.FilePath);
   TTree* tree = (TTree*) f->Get("markusTreeProducer"); 
-  outputFileName = mySample.SampleName+".root";
+  outputFileName = mySample.OutputFileNameTag+".root";
   weight = mySample.weight();
-  cout << "weight again " << weight <<endl;;
   Mstop= Mstop_;
   MLSP=MLSP_;
-  maxEvents = mySample.TotalEvNum;
   Init(tree);
+  cout << "looping over: \""<< mySample.FilePath<< "\" to put plots into: \""<< outputFileName<<"\""<<endl;;
 
 }
 
@@ -443,6 +442,7 @@ Int_t SUSYLooperHists::Cut(Long64_t entry)
 {
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
+  cout << " can be used to put preselection cuts for " << entry<<endl;
 // returns -1 otherwise.
    return 1;
 }

@@ -4,27 +4,41 @@
 
 void myplots()
 {
+  // all files are at eos, so start with these
+  SampleInfo eosZll(40.5,2655795,19.7,TString("root://eoscms.cern.ch//eos/cms/store/cmst3/group/susy/markus/preliminary_samples_11thApril_2014/DYJetsToLLPtZ100/markusTreeProducer/markusTreeProducer_tree.root"),TString("Zll"),TString("Z(ll)"),5);
 
+  // You can copy them over to your local directory to gain speed
+  SampleInfo Zll(40.5,2655795,19.7,TString("../data_test_antonios/DYJetsToLLPtZ100/markusTreeProducer/markusTreeProducer_tree.root"),TString("Zll"),TString("Z(ll)"),5);;
 
-  // 
+  // pathes below to local directories 
   SampleInfo wjet(282,12742383,19.7 ,TString("../data_test_antonios/WPT100JETS/markusTreeProducer/markusTreeProducer_tree.root"),TString("W_PT_100"),TString("W PT 100"),2);
   SampleInfo ttsemi(106.15,320./963.*24895259,19.7,TString("../data_test_antonios/myhaddedFileTsemi.root"),TString("TTbarSemiLep"),TString("tt(l)"),4);
-  SampleInfo ttlep(25.8,11947326*0.467,19.7,TString("../data_test_antonios/myhaddedFileTlep.root"),TString("TTbarFullyLep"),TString("tt(l)"),5);
-  SampleInfo Zll(40.5,2655795,19.7,TString("../data_test_antonios/DYJetsToLLPtZ100/markusTreeProducer/markusTreeProducer_tree.root"),TString("Zll"),TString("Z(ll)"),5);
+  SampleInfo ttlep(25.8,11947326*0.467,19.7,TString("../data_test_antonios/myhaddedFileTlep.root"),TString("TTbarFullyLep"),TString("tt(ll)"),5);
   SampleInfo Znunu50(435.71,4040980,19.7,TString("../data_test_antonios/ZJetsToNuNu100/markusTreeProducer/markusTreeProducer_tree.root"),TString("Znunu50"),TString("Z(#nu#nu)"),5);
   SampleInfo Znunu100(186.84,4416646,19.7,TString("../data_test_antonios/ZJetsToNuNu100/markusTreeProducer/markusTreeProducer_tree.root"),TString("Znunu100"),TString("Z(#nu#nu)"),5);
   SampleInfo Znunu200(45.60,5055885,19.7,TString("../data_test_antonios/ZJetsToNuNu100/markusTreeProducer/markusTreeProducer_tree.root"),TString("Znunu200"),TString("Z(#nu#nu)"),5);
   SampleInfo Znunu400(6.25,1006928,19.7,TString("../data_test_antonios/ZJetsToNuNu100/markusTreeProducer/markusTreeProducer_tree.root"),TString("Znunu400"),TString("Z(#nu#nu)"),5);
   SampleInfo ZZ4mu(6.25,1006928,19.7,TString("/afs/cern.ch/work/m/mstoye/CMGTools_SUSY/CMSSW_5_3_14/src/CMGTools/TTHAnalysis/cfg/Zz4mu/ZZTo4mu/markusTreeProducer/markusTreeProducer_tree.root"),TString("ZZ4m"),TString("Z(#nu#nu)"),5);
-  SampleInfo ZZ(6.25,1006928,19.7,TString("ZZpythia.root"),TString("ZZ4m"),TString("Z(#nu#nu)"),5);
+  //  SampleInfo ZZ(6.25,1006928,19.7,TString("ZZpythia.root"),TString("ZZ4m"),TString("Z(#nu#nu)"),5);
 
 
   vector <TFile*> Files;
   vector <SampleInfo> Names;
-  SUSYLooperHists myZll(Zll);
+
+  SUSYLooperHists myZll(eosZll);
   TFile* myZllfile = myZll.Loop();
-  Files.push_back(myZll);
+  Files.push_back(myZllfile);
+  Names.push_back(eosZll);
+
+  cout << endl<< "see the difference local vs. eos" <<endl <<endl;
+
+  SUSYLooperHists myLocalZll(Zll);
+  TFile* myLocalZllfile = myLocalZll.Loop();
+  Files.push_back(myLocalZllfile);
   Names.push_back(Zll);
+
+  cout <<" further samples "<<endl;
+
   SUSYLooperHists mytt2l(ttlep);
   TFile* myttlep = mytt2l.Loop();
   Files.push_back(myttlep);
