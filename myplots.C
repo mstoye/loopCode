@@ -1,156 +1,133 @@
 #include "SampleInfo.h" 
 #include "SUSYLooperHists.C" 
+#include "TLegend.h" 
 #include <vector>
+
+
+// just to overlay some plots, should be more automated, e.g. how to check which histo is data, axis ranges, overflows, ratio plots
+void plotHist (  vector <TFile*> Files,  vector <SampleInfo> Names, TString Histname)
+  {
+   TCanvas* canvas = new  TCanvas(Histname+"can",Histname+"can");
+   TLegend* alegend = new TLegend(0.6,0.6,0.99,0.99);
+   alegend->SetFillColor(0);
+
+   TH1D* histMC = NULL; // histogramm for all MCs added
+   int first=0;
+   for (int i =0 ;i< Names.size(); i++)
+     {
+       
+       TH1D* hist = (TH1D*) Files[i]->Get(Histname);
+       hist->SetLineColor(Names[i].color);
+       cout << Names[i].CrossSection <<endl;
+      //  hist->Scale(Names[i].weight());
+       alegend->AddEntry(hist, Names[i].LegendLabel,"lp");
+       if(i==0) {
+	 // can be done more automated, i.e. check CrossSection<0 to use "data" style
+	 hist->SetMarkerStyle(20);
+	 hist->SetMarkerSize(1.5);
+	 hist->Draw("P");
+       }   
+       else   hist->Draw("HIST same");
+       if(Names[i].CrossSection>0) { // for data the x-section is set to -1
+	 if(first==0){
+	   histMC = ( TH1D*)  hist->Clone();
+	   first++;
+	 }
+	 else{
+	   histMC->Add(hist,1);
+	 }
+       }
+     }
+
+   histMC->SetLineColor(kRed);
+   alegend->AddEntry(histMC,"all MC","lp");
+   histMC->SetLineWidth(3);
+   histMC->Draw("same");
+   alegend->Draw("same");
+ 
+}
 
 void myplots()
 {
+
+  // initialising the samples to run on 
+
   // all files are at eos, so start with these
-  SampleInfo eosZll(40.5,2655795,19.7,TString("root://eoscms.cern.ch//eos/cms/store/cmst3/group/susy/markus/preliminary_samples_11thApril_2014/DYJetsToLLPtZ100/markusTreeProducer/markusTreeProducer_tree.root"),TString("Zll"),TString("Z(ll)"),5);
+  SampleInfo eosZll(19.7,2655795,40.5,TString("root://eoscms.cern.ch//eos/cms/store/cmst3/group/susy/markus/preliminary_samples_11thApril_2014/DYJetsToLLPtZ100/markusTreeProducer/markusTreeProducer_tree.root"),TString("Z_ll"),TString("Z(ll)"),2);
 
   // You can copy them over to your local directory to gain speed
-  SampleInfo Zll(40.5,2655795,19.7,TString("../data_test_antonios/DYJetsToLLPtZ100/markusTreeProducer/markusTreeProducer_tree.root"),TString("Zll"),TString("Z(ll)"),5);;
+  SampleInfo Zll(19.7,2655795,40.5,TString("../data_test_antonios/DYJetsToLLPtZ100/markusTreeProducer/markusTreeProducer_tree.root"),TString("Z(ll)"),TString("Zll"),2);
 
   // pathes below to local directories 
-  SampleInfo wjet(282,12742383,19.7 ,TString("../data_test_antonios/WPT100JETS/markusTreeProducer/markusTreeProducer_tree.root"),TString("W_PT_100"),TString("W PT 100"),2);
-  SampleInfo ttsemi(106.15,320./963.*24895259,19.7,TString("../data_test_antonios/myhaddedFileTsemi.root"),TString("TTbarSemiLep"),TString("tt(l)"),4);
-  SampleInfo ttlep(25.8,11947326*0.467,19.7,TString("../data_test_antonios/myhaddedFileTlep.root"),TString("TTbarFullyLep"),TString("tt(ll)"),5);
-  SampleInfo Znunu50(435.71,4040980,19.7,TString("../data_test_antonios/ZJetsToNuNu100/markusTreeProducer/markusTreeProducer_tree.root"),TString("Znunu50"),TString("Z(#nu#nu)"),5);
-  SampleInfo Znunu100(186.84,4416646,19.7,TString("../data_test_antonios/ZJetsToNuNu100/markusTreeProducer/markusTreeProducer_tree.root"),TString("Znunu100"),TString("Z(#nu#nu)"),5);
-  SampleInfo Znunu200(45.60,5055885,19.7,TString("../data_test_antonios/ZJetsToNuNu100/markusTreeProducer/markusTreeProducer_tree.root"),TString("Znunu200"),TString("Z(#nu#nu)"),5);
-  SampleInfo Znunu400(6.25,1006928,19.7,TString("../data_test_antonios/ZJetsToNuNu100/markusTreeProducer/markusTreeProducer_tree.root"),TString("Znunu400"),TString("Z(#nu#nu)"),5);
-  SampleInfo ZZ4mu(6.25,1006928,19.7,TString("/afs/cern.ch/work/m/mstoye/CMGTools_SUSY/CMSSW_5_3_14/src/CMGTools/TTHAnalysis/cfg/Zz4mu/ZZTo4mu/markusTreeProducer/markusTreeProducer_tree.root"),TString("ZZ4m"),TString("Z(#nu#nu)"),5);
-  //  SampleInfo ZZ(6.25,1006928,19.7,TString("ZZpythia.root"),TString("ZZ4m"),TString("Z(#nu#nu)"),5);
+  SampleInfo wjet(19.7 ,12742383,282,TString("../data_test_antonios/WPT100JETS/markusTreeProducer/markusTreeProducer_tree.root"),TString("W_PT_100"),TString("W(l#nu)"),2);
+  SampleInfo ttsemi(19.7,320./963.*24895259,106.15,TString("../data_test_antonios/myhaddedFileTsemi.root"),TString("TTbarSemiLep"),TString("tt(l)"),7);
+  SampleInfo ttlep(19.7,11947326*0.467,25.8,TString("../data_test_antonios/myhaddedFileTlep.root"),TString("TTbarFullyLep"),TString("tt(ll)"),8);
+  //  SampleInfo Znunu50(19.7,4040980,435.71,TString("../data_test_antonios/ZJetsToNuNu100/markusTreeProducer/markusTreeProducer_tree.root"),TString("Znunu50"),TString("Z(#nu#nu)"),5);
+  //  SampleInfo Znunu100(19.7,4416646,186.84,TString("../data_test_antonios/ZJetsToNuNu100/markusTreeProducer/markusTreeProducer_tree.root"),TString("Znunu100"),TString("Z(#nu#nu)"),5);
+  //  SampleInfo Znunu200(19.7,5055885,45.60,TString("../data_test_antonios/ZJetsToNuNu100/markusTreeProducer/markusTreeProducer_tree.root"),TString("Znunu200"),TString("Z(#nu#nu)"),5);  SampleInfo Znunu400(19.7,1006928,6.25,TString("../data_test_antonios/ZJetsToNuNu100/markusTreeProducer/markusTreeProducer_tree.root"),TString("Znunu400"),TString("Z(#nu#nu)"),5);
+  //  SampleInfo ZZ4mu(19.7,1006928,6.25,TString("/afs/cern.ch/work/m/mstoye/CMGTools_SUSY/CMSSW_5_3_14/src/CMGTools/TTHAnalysis/cfg/Zz4mu/ZZTo4mu/markusTreeProducer/markusTreeProducer_tree.root"),TString("ZZ4m"),TString("Z(#nu#nu)"),5);
+  SampleInfo data(19.7,947236  ,-1,TString("data.root"),TString("datapl"),TString("datapl"),1);
+  SampleInfo ZZll(19.7,947236  ,0.28,TString("/afs/cern.ch/work/m/mstoye/CMGTools_SUSY/CMSSW_5_3_14/src/CMGTools/TTHAnalysis/cfg/ZZllnunumad/ZZJetsTo2L2Nu/markusTreeProducer/markusTreeProducer_tree.root"),TString("ZZ(ll#nu#nu)"),TString("ZZll"),3);
+  SampleInfo WZll(19.7, 2007116 ,0.8674,TString("/afs/cern.ch/work/m/mstoye/CMGTools_SUSY/CMSSW_5_3_14/src/CMGTools/TTHAnalysis/cfg/WZmad/WZJets/markusTreeProducer/markusTreeProducer_tree.root"),TString("WZ(ll)"),TString("WZll"),4);
 
 
+  // for a quick plot a Tfiles are stored in vectors, can be done in many ways
   vector <TFile*> Files;
   vector <SampleInfo> Names;
 
-  SUSYLooperHists myZll(eosZll);
-  TFile* myZllfile = myZll.Loop();
-  Files.push_back(myZllfile);
-  Names.push_back(eosZll);
+  //  SUSYLooperHists myZll(eosZll);
+  //  TFile* myZllfile = myZll.Loop();
+  //  Files.push_back(myZllfile);
+  //  Names.push_back(eosZll);
+  //  cout << endl<< "see the difference local vs. eos" <<endl <<endl;
 
-  cout << endl<< "see the difference local vs. eos" <<endl <<endl;
+  SUSYLooperHists mydata(data);
+  TFile* mydataplots = mydata.Loop();
+  Files.push_back(mydataplots);
+  Names.push_back(data);
 
   SUSYLooperHists myLocalZll(Zll);
   TFile* myLocalZllfile = myLocalZll.Loop();
   Files.push_back(myLocalZllfile);
   Names.push_back(Zll);
 
-  cout <<" further samples "<<endl;
+  SUSYLooperHists myWZll(WZll);
+  TFile* myWZllfile = myWZll.Loop();
+  Files.push_back(myWZllfile);
+  Names.push_back(WZll);
+  
+  SUSYLooperHists myZZll(ZZll);
+  TFile* myZZllfile = myZZll.Loop();
+  Files.push_back(myZZllfile);
+  Names.push_back(ZZll);
 
   SUSYLooperHists mytt2l(ttlep);
   TFile* myttlep = mytt2l.Loop();
   Files.push_back(myttlep);
   Names.push_back(ttlep);
+ 
   SUSYLooperHists mytt1l(  ttsemi);
   TFile* mytt1lep = mytt1l.Loop();
   Files.push_back(mytt1lep);
   Names.push_back(ttsemi);
-  
-  /*
-   SUSYLooperHists myZnunu50(Znunu50);
-   TFile* myZnunu50file = myZnunu50.Loop();
-   Files.push_back(myZnunu50file);
-   Names.push_back(Znunu50);
-   SUSYLooperHists myZnunu100(Znunu100);
-   TFile* myZnunu100file = myZnunu100.Loop();
-   Files.push_back(myZnunu100file);
-   Names.push_back(Znunu100);
-   SUSYLooperHists myZnunu200(Znunu200);
-   TFile* myZnunu200file = myZnunu200.Loop();
-   Files.push_back(myZnunu200file);
-   Names.push_back(Znunu200);
-   SUSYLooperHists myZnunu400(Znunu400);
-   TFile* myZnunu400file = myZnunu400.Loop();
-   Files.push_back(myZnunu400file);
-   Names.push_back(Znunu400);
- 
-   SUSYLooperHists myZll(Zll);
-   TFile* myZllfile = myZll.Loop();
-   Files.push_back(myZllfile);
-   Names.push_back(Zll);
-  
 
-   SampleInfo T23(1.99608,156000,TString("../data_test_antonios/T2degTest/markusTreeProducer/markusTreeProducer_tree.root"),TString("PrelimT2_out"),TString("PrelimT2_out"),4);
+  SUSYLooperHists myWs(wjet);
+  TFile* myWplots = myWs.Loop();
+  Files.push_back(myWplots);
+  Names.push_back(wjet);
+
+
+  /*
+    SampleInfo T23(1.99608,156000,19.7,TString("../data_test_antonios/T2degTest/markusTreeProducer/markusTreeProducer_tree.root"),TString("PrelimT2_out"),TString("PrelimT2_out"),4);
     SUSYLooperHists T2loop3(T23);
     TFile* T2loopFile3 = T2loop3.Loop();
     Files.push_back(T2loopFile3);
     Names.push_back(T23);
   */
-    /*
-   SUSYLooperHists myZll(Zll);
-   TFile* myZllfile = myZll.Loop();
-   Files.push_back(myZllfile);
-   Names.push_back(Zll);
-   
-    SUSYLooperHists myWs(wjet);
-     TFile* myWplots = myWs.Loop();
-    Files.push_back(myWplots);
-    Names.push_back(wjet);
-   */
-  
 
-    /*
-    
-  
-    
-   TCanvas* canvas = new  TCanvas("LepTwoZmass","LepTwoZmass");
-   
-
-
-   for (int i =0 ;i< Names.size(); i++)
-     {
-       
-      TH1D* hist = (TH1D*) Files[i]->Get("Iso1D");
-      hist->SetLineColor(Names[i].SampleColor);
-      
-      //  hist->Scale(Names[i].weight());
-      if(i==0) hist->Draw();
-      else   hist->Draw("same");
-    }
-  
-  TCanvas* canvaos = new  TCanvas("LepPtW","LeoptW");
-  
-  for (int i =0 ;i< Names.size(); i++)
-    {
-      
-      TH1D* hist = (TH1D*) Files[i]->Get("MHTHT");
-      hist->SetLineColor(Names[i].SampleColor);
-      
-      //   hist->Scale(Names[i].weight());
-      if(i==0) hist->Draw();
-      else   hist->Draw("same");
-    }
-  TCanvas* can76vaos = new  TCanvas("LetW","LtW");
-  
-  for (int i =0 ;i< Names.size(); i++)
-    {
-      
-      TH1D* hist = (TH1D*) Files[i]->Get("LepPtTwo");
-      hist->SetLineColor(Names[i].SampleColor);
-      
-      //    hist->Scale(Names[i].weight());
-      if(i==0) hist->Draw();
-      else   hist->Draw("same");
-    }
-
-
- TCanvas* SBcan = new  TCanvas("SB","SB");
-
-
- TH2D* hist = (TH2D*) Files[0]->Get("STLepM");
- hist->Scale(Names[0].weight());
- TH2D* histStop = (TH2D*) Files[1]->Get("STLepM");
- histStop->Scale(Names[1].weight());
- SBcan->Divide(2);
- SBcan->cd(1);
- histStop->DrawCopy("colz");
- histStop->Divide(hist);
- SBcan->cd(2);
- histStop->DrawCopy("colz");
-   
-
-    */
+  // this is a plot to test the loops, for regular/frequent plotting with overlaying histograms code should be written in a automated manner starting from stored Tfiles
+  plotHist(Files,Names,TString("Sig"));
+  plotHist(Files,Names,TString("IP3D"));
 }
+
 
