@@ -30,7 +30,7 @@ float SampleInfo::weight()
   if(CrossSection==-1) return 1.; // for data
   else
     {
-      return (CrossSection/NEvents*Lumi);
+      return (CrossSection/NEvents*Lumi*1000);
     }
 };
 #endif 

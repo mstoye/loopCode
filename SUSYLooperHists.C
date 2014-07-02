@@ -50,6 +50,21 @@ TFile* SUSYLooperHists::Loop()
    TH1D* CutFlow = new TH1D("CutFlow",";CutFlow [unweighted];",20,-0.5,19.5);
    CutFlow->Sumw2();
 
+   TH1D* Sig = new TH1D("Sig",";3DSig;",50,-0.,50);
+   Sig->Sumw2();
+  TH1D* IP3D = new TH1D("IP3D",";IP3D;",500,-0.,.5);
+   IP3D->Sumw2();
+   TH1D* Sig0 = new TH1D("Sig0",";3DSig;",50,-0.,50);
+   Sig0->Sumw2();
+   TH1D* Pt = new TH1D("Pt",";Pt;",200,-0.,25);
+   Pt->Sumw2();
+   TH1D* Iso = new TH1D("Is",";Is;",200,-0.,5);
+   Iso->Sumw2();
+   TH1D* LooseBPt = new TH1D("LooseBPt",";Pt;",200,-0.,500);
+   LooseBPt->Sumw2();
+
+
+
  // a scan should be filled without weights before any cut to get the efficiency. The reason is that for a scan each points have different x-section, which are not accessable during the loop
    TH2D* scan = new TH2D("scan","scan",8,112.5,312.5,40,112.5,312.5);
    // fill after some cuts the scans to get efficiency, i.e. ->Divide(scan) after the loop
@@ -57,6 +72,9 @@ TFile* SUSYLooperHists::Loop()
    TH2D* scanB = new TH2D("scanB","scan",8,112.5,312.5,40,112.5,312.5);
    TH2D* scanC = new TH2D("scanC","scan",8,112.5,312.5,40,112.5,312.5);
 
+   // plot a mass
+   TH1D* GenMll = new TH1D("GenMll",";GenMll;",200,-0,200);
+   GenMll->Sumw2();
 
    Long64_t nbytes = 0, nb = 0;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
@@ -68,6 +86,7 @@ TFile* SUSYLooperHists::Loop()
       if(jentry%100000==0) cout << "Event: "<<jentry <<endl;
       scan->Fill(GenSusyMStop,GenSusyMNeutralino);
       // select lepton and put it into TLorentzvector 
+
 
       TLorentzVector lep;
       TLorentzVector met;
@@ -87,6 +106,8 @@ TFile* SUSYLooperHists::Loop()
       jetSum.SetPtEtaPhiM(0,0,0,0);
       unsigned int nb40=0;
       unsigned int nb30L=0;
+
+
 
       float HT30 = 0;
       for (int i=0;i<nJet;i++)
@@ -119,7 +140,7 @@ TFile* SUSYLooperHists::Loop()
       if(nJet==0)  continue;
       if(nTauGood!=0)  continue;
       CutFlow->Fill(1.);
-      if(fabs(LepGood_pdgId[0]* LepGood_pdgId[1])<122)   continue;
+      // if(fabs(LepGood_pdgId[0]* LepGood_pdgId[1])<122)   continue;
       CutFlow->Fill(2.);
       if(lep.Pt()<5||fabs(lep.Eta())>1.5||lep.Pt()>60) continue;
       CutFlow->Fill(3.);
@@ -147,7 +168,7 @@ TFile* SUSYLooperHists::Loop()
       if(met.Pt()/HT30<2./3.) continue;
       if(nb40!=0) continue;    
       CutFlow->Fill(9.);
-    // preselection syncronizd to  ++++++++++++++++++++
+    // preselection syncronized to  ++++++++++++++++++++
 
       if(MT>60&&MT<100) continue;
  
@@ -160,15 +181,22 @@ TFile* SUSYLooperHists::Loop()
       if (pairmass<0) pairmass=0.;
 
       LepTwoZmass->Fill(pairmass,weight*puWeight);
+      //      cout << LepGood_pdgId[0]* LepGood_pdgId[1] << " Ids "<<endl;
 
-
-	if((LepGood_pdgId[0]* LepGood_pdgId[1]<-121))
+      if(LepGood_pdgId[0]* LepGood_pdgId[1]>121) //same sign
 	  {
 	 
-	    if(pairmass>160||pairmass<20){
+	     if((pairmass>160||pairmass<20)){
 	      CutFlow->Fill(10., weight*puWeight);
 	      scanB->Fill(GenSusyMStop,GenSusyMNeutralino);
-	    
+	      // if (weight<0) weight=1;
+	      Sig->Fill(LepGood_sip3d[1],weight);
+	      Sig0->Fill(LepGood_sip3d[0],weight);
+	      IP3D->Fill(LepGood_ip3d[0],weight);
+	      Pt->Fill(secondLep.Pt(),weight);
+	      Iso->Fill(LepGood_relIso[1]*secondLep.Pt(),weight);
+	      
+
 	      if(nb30L==0)
 		{	
 		  scanC->Fill(GenSusyMStop,GenSusyMNeutralino);
@@ -176,7 +204,7 @@ TFile* SUSYLooperHists::Loop()
 	      for (int i=0;i<nJet;i++)
 		{
 		  if(Jet_btagCSV[i]>0.244 ) {
-		    // LooseBPt->Fill(Jet_pt[i],weight );		    
+		   LooseBPt->Fill(Jet_pt[i],weight );		    
 		  }
 		  //	   QG->Fill(Jet_quarkGluonID[i]);
 		}
@@ -197,7 +225,7 @@ TFile* SUSYLooperHists::Loop()
    scanB->Divide(scan);
    scanC->Divide(scan);
 
-   CutFlow->DrawCopy();
+   //  CutFlow->DrawCopy();
 
    myFile->Write();
    return (myFile);
