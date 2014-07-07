@@ -38,11 +38,16 @@ void plotHist (  vector <TFile*> Files,  vector <SampleInfo> Names, TString Hist
 	 }
        }
      }
-
-   histMC->SetLineColor(kRed);
-   alegend->AddEntry(histMC,"all MC","lp");
-   histMC->SetLineWidth(3);
-   histMC->Draw("same");
+   if(histMC==NULL) 
+     {
+       cout <<"WARNING: The plotHist aim to overlay MC and data, no MC has been givem (no .0 X-section found)"<<endl;
+     }
+   else{ 
+     histMC->SetLineColor(kRed);
+     alegend->AddEntry(histMC,"all MC","lp");
+     histMC->SetLineWidth(3);
+     histMC->Draw("same");
+   }
    alegend->Draw("same");
  
 }
