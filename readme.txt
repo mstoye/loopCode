@@ -11,28 +11,30 @@ When running the code make sure your root version understand eos and or you use 
 
 
 _______________________________________________________________________________________________________
-changes to makeClass code:
+changes to makeClass code, e.g. XYZ.C 
 
 
-// default from makeClass():
+// defaults  from makeClass() that need to be changed
 
-class markusTreeProducer {
+class XYZ {
+
+ public:
 ...
   void      Loop(); // return nothing
 ...
 
 }
 
-markusTreeProducer::markusTreeProducer(TTree *tree) : fChain(0) // need to give it a tree
+XYZ::XYZ(TTree *tree) : fChain(0) // need to give it a tree
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("data.root"); 
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("XYZ.root"); 
       if (!f || !f->IsOpen()) {
          f = new TFile("data.root");
       }
-      f->GetObject("markusTreeProducer",tree);
+      f->GetObject("XYZ",tree);
 
    }
    Init(tree);
@@ -42,10 +44,21 @@ markusTreeProducer::markusTreeProducer(TTree *tree) : fChain(0) // need to give 
 Here the changes for SUSYLooperHists!!
 
 //*** return a TFile pointer for the loop, allows to handle the  TFile withplots afterwards easily***
+// add this +++++ to header
+#include "SampleInfo.h" 
+#include <TString.h>
 
 class SUSYLooperHists {
+
+// add this +++++ (members)
+ private:
+  TString outputFileName;
+  float weight;
+//  ++++++++
+
 ...
-  TFile*      Loop();// returns Tfile with plots
+  TFile*      Loop();// returns Tfile with plots: replace void  Loop();
+  susySoftLepton(SampleInfo mySample);// constructor that takes sample info as input: replace default contructor susySoftLepton(TTree *tree=0);
 ...
 
 }
@@ -55,7 +68,7 @@ SUSYLooperHists::SUSYLooperHists(SampleInfo mySample)// need to give it a Sample
 {
 
   TFile *f = TFile::Open(mySample.FilePath);
-  TTree* tree = (TTree*) f->Get("markusTreeProducer"); 
+  TTree* tree = (TTree*) f->Get(YOURTREENAME); 
   outputFileName = mySample.OutputFileNameTag+".root";
   weight = mySample.weight();
   Init(tree);
