@@ -13,7 +13,7 @@ void plotHist (  vector <TFile*> Files,  vector <SampleInfo> Names, TString Hist
 
    TH1D* histMC = NULL; // histogramm for all MCs added
    int first=0;
-   for (int i =0 ;i< Names.size(); i++)
+   for (unsigned int i =0 ;i< Names.size(); i++)
      {
        
        TH1D* hist = (TH1D*) Files[i]->Get(Histname);
@@ -49,8 +49,45 @@ void plotHist (  vector <TFile*> Files,  vector <SampleInfo> Names, TString Hist
      histMC->Draw("same");
    }
    alegend->Draw("same");
- 
 }
+
+void plotHist2D (  vector <TFile*> Files,  vector <SampleInfo> Names, TString Histname)
+  {
+   TCanvas* canvas = new  TCanvas(Histname+"can",Histname+"can");
+   canvas->Divide(2);
+  
+   TH2D* histMC = NULL; // histogramm for all MCs added
+   int first=0;
+   for (unsigned int i =0 ;i< Names.size(); i++)
+     {
+       
+       TH2D* hist = (TH2D*) Files[i]->Get(Histname);
+       if(Names[i].CrossSection>0) { // for data the x-section is set to -1
+	 if(first==0){
+	   histMC = ( TH2D*)  hist->Clone();
+	   first++;
+	 }
+	 else{
+	   histMC->Add(hist,1);
+	 }
+       }
+       else{ 
+	 canvas->cd(1);
+	 hist->Draw("colz");
+       }
+     }
+   if(histMC==NULL) 
+     {
+       cout <<"WARNING: The plotHist aim to overlay MC and data, no MC has been givem (no .0 X-section found)"<<endl;
+     }
+   else{ 
+     canvas->cd(2);
+     histMC->Draw("colz");
+    
+   }
+   
+}
+
 
 void myplots()
 {
@@ -75,6 +112,8 @@ void myplots()
   SampleInfo ZZll(19.7,947236  ,0.28,TString("/afs/cern.ch/work/m/mstoye/CMGTools_SUSY/CMSSW_5_3_14/src/CMGTools/TTHAnalysis/cfg/ZZllnunumad/ZZJetsTo2L2Nu/markusTreeProducer/markusTreeProducer_tree.root"),TString("ZZ(ll#nu#nu)"),TString("ZZll"),3);
   SampleInfo WZll(19.7, 2007116 ,0.8674,TString("/afs/cern.ch/work/m/mstoye/CMGTools_SUSY/CMSSW_5_3_14/src/CMGTools/TTHAnalysis/cfg/WZmad/WZJets/markusTreeProducer/markusTreeProducer_tree.root"),TString("WZ(ll)"),TString("WZll"),4);
 
+
+  // signal 
 
   // for a quick plot a Tfiles are stored in vectors, can be done in many ways
   vector <TFile*> Files;
@@ -111,7 +150,7 @@ void myplots()
   Files.push_back(myttlep);
   Names.push_back(ttlep);
  
-  SUSYLooperHists mytt1l(  ttsemi);
+  SUSYLooperHists mytt1l( ttsemi);
   TFile* mytt1lep = mytt1l.Loop();
   Files.push_back(mytt1lep);
   Names.push_back(ttsemi);
@@ -133,6 +172,12 @@ void myplots()
   // this is a plot to test the loops, for regular/frequent plotting with overlaying histograms code should be written in a automated manner starting from stored Tfiles
   plotHist(Files,Names,TString("Sig"));
   plotHist(Files,Names,TString("IP3D"));
+
+ plotHist(Files,Names,TString("Dz"));
+  plotHist(Files,Names,TString("Dxy"));
+plotHist2D(Files,Names,TString("DxyDz"));
+
+
 }
 
 

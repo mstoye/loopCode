@@ -50,9 +50,17 @@ TFile* SUSYLooperHists::Loop()
    TH1D* CutFlow = new TH1D("CutFlow",";CutFlow [unweighted];",20,-0.5,19.5);
    CutFlow->Sumw2();
 
-   TH1D* Sig = new TH1D("Sig",";3DSig;",50,-0.,50);
+   TH1D* Sig = new TH1D("Sig",";3DSig;",25,-0.,50);
    Sig->Sumw2();
-  TH1D* IP3D = new TH1D("IP3D",";IP3D;",500,-0.,.5);
+   TH1D* Dxy = new TH1D("Dxy",";Dxy;",50,-0.,0.2);
+   Dxy->Sumw2();
+   TH1D* Dz = new TH1D("Dz",";Dz;",50,-0.,0.2);
+   Dz->Sumw2();
+   TH2D* DxyDz = new TH2D("DxyDz",";3DSig;",100,-0.,0.2,100,-0.,0.2);
+   DxyDz->Sumw2();
+
+
+   TH1D* IP3D = new TH1D("IP3D",";IP3D;",500,-0.,.5);
    IP3D->Sumw2();
    TH1D* Sig0 = new TH1D("Sig0",";3DSig;",50,-0.,50);
    Sig0->Sumw2();
@@ -135,6 +143,7 @@ TFile* SUSYLooperHists::Loop()
       // preselection syncronizd to Antonis ++++++++++++++++++++
       if( nLepGood == 0  ) continue;
       CutFlow->Fill(0.);
+      if(HLT_MetTrigger!=1)  continue;
       if(met.Pt()<200) continue;
       if(nLepGood<2)  continue;
       if(nJet==0)  continue;
@@ -170,11 +179,11 @@ TFile* SUSYLooperHists::Loop()
       CutFlow->Fill(9.);
     // preselection syncronized to  ++++++++++++++++++++
 
-      if(MT>60&&MT<100) continue;
+    //  if(MT>60&&MT<100) continue;
  
 
       float pairmass = DiTau_InvMass(met,lep,secondLep,0);     
-      if(lep.Pt()>25||secondLep.Pt()>15) continue;
+      if(lep.Pt()>50||secondLep.Pt()>15) continue;
  
       // define some over and underflow 
       if (pairmass>2000) pairmass=1999.;
@@ -195,7 +204,9 @@ TFile* SUSYLooperHists::Loop()
 	      IP3D->Fill(LepGood_ip3d[0],weight);
 	      Pt->Fill(secondLep.Pt(),weight);
 	      Iso->Fill(LepGood_relIso[1]*secondLep.Pt(),weight);
-	      
+	      Dxy->Fill(fabs(LepGood_dxy[1]),weight);
+	      Dz->Fill(fabs(LepGood_dz[1]),weight);
+	      DxyDz->Fill(fabs(LepGood_dxy[1]),fabs(LepGood_dz[1]),weight);
 
 	      if(nb30L==0)
 		{	
