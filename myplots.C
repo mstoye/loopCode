@@ -112,7 +112,8 @@ void myplots()
   SampleInfo ZZll(19.7,947236  ,0.28,TString("/afs/cern.ch/work/m/mstoye/CMGTools_SUSY/CMSSW_5_3_14/src/CMGTools/TTHAnalysis/cfg/ZZllnunumad/ZZJetsTo2L2Nu/markusTreeProducer/markusTreeProducer_tree.root"),TString("ZZ(ll#nu#nu)"),TString("ZZll"),3);
   SampleInfo WZll(19.7, 2007116 ,0.8674,TString("/afs/cern.ch/work/m/mstoye/CMGTools_SUSY/CMSSW_5_3_14/src/CMGTools/TTHAnalysis/cfg/WZmad/WZJets/markusTreeProducer/markusTreeProducer_tree.root"),TString("WZ(ll)"),TString("WZll"),4);
 
-
+  SampleInfo WW(19.7, 9976539,54.80,TString("/disk2/WWtree.root"),TString("WW"),TString("WW"),7);
+  SampleInfo singleTop(19.7,991118 ,22,TString("/disk2/singleTop.root"),TString("t"),TString("t"),12);
   // signal 
 
   // for a quick plot a Tfiles are stored in vectors, can be done in many ways
@@ -159,6 +160,18 @@ void myplots()
   TFile* myWplots = myWs.Loop();
   Files.push_back(myWplots);
   Names.push_back(wjet);
+
+  SUSYLooperHists myWW(WW);
+  TFile* myWWplots = myWW.Loop();
+  Files.push_back(myWWplots);
+  Names.push_back(WW);
+
+SUSYLooperHists mysingleTop(singleTop);
+  TFile* mysingleTopplots = mysingleTop.Loop();
+  Files.push_back(mysingleTopplots);
+  Names.push_back(singleTop);
+
+
 
 
   /*
