@@ -44,9 +44,9 @@ void plotHist (  vector <TFile*> Files,  vector <SampleInfo> Names, TString Hist
      }
    else{ 
      histMC->SetLineColor(kRed);
-     alegend->AddEntry(histMC,"all MC","lp");
+     // alegend->AddEntry(histMC,"all MC","lp");
      histMC->SetLineWidth(3);
-     histMC->Draw("same");
+     //   histMC->Draw("same");
    }
    alegend->Draw("same");
 }
@@ -156,10 +156,10 @@ void myplots()
   Names.push_back(ttlep);
   */
 
-  SUSYLooperHists mytt1l(privateZZll);
-  TFile* mytt1lep = mytt1l.Loop();
-  Files.push_back(mytt1lep);
-  Names.push_back(privateZZ);
+  SUSYLooperHists myprivateZZll(privateZZll);
+  TFile* myprivateZZllfile = myprivateZZll.Loop();
+  Files.push_back(myprivateZZllfile);
+  Names.push_back(privateZZll);
   
   SUSYLooperHists myZZll(ZZll);
   TFile* myZZllfile = myZZll.Loop();
