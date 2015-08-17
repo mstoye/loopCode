@@ -7,7 +7,7 @@ class SampleInfo
 {
 
  public:
-  SampleInfo( float Lumi_,float NEvents_,float CrossSection_,TString FilePath_, TString LegendLabel_,TString OutputFileNameTag_,int color_, int Mstop_=0, int Mlsp_=0 ): Lumi(Lumi_),NEvents(NEvents_), CrossSection(CrossSection_),FilePath(FilePath_),LegendLabel(LegendLabel_),OutputFileNameTag(OutputFileNameTag_), color(color_), Mstop(Mstop_), Mlsp(Mlsp_)
+  SampleInfo( float Lumi_,float NEvents_,float CrossSection_,TString FilePath_, TString LegendLabel_,TString OutputFileNameTag_,int color_): Lumi(Lumi_),NEvents(NEvents_), CrossSection(CrossSection_),FilePath(FilePath_),LegendLabel(LegendLabel_),OutputFileNameTag(OutputFileNameTag_), color(color_))
 {;}
     ;
   float weight();
@@ -21,8 +21,7 @@ class SampleInfo
   TString LegendLabel;
   TString OutputFileNameTag;
   int color;
-  int Mstop;
-    int Mlsp;
+ 
 
 };
 
