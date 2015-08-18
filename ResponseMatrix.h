@@ -1,10 +1,12 @@
+#include "A7LoopBase.h"
+#include "SampleInfo.h" 
+
 #ifndef ResponseMatrix_h
 #define ResponseMatrix_h
 
-#include "SUSYLooperHistsSoftBase.h"
-#include "SampleInfo.h" 
 
-class ResponseMatrix : public SUSYLooperHistsSoftBase
+
+class ResponseMatrix : public A7LoopBase
 {
    public:
    ResponseMatrix(SampleInfo mySample) {setTree(mySample);};

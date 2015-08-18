@@ -1,3 +1,4 @@
+#ifndef A7LoopBase_cxx 
 #define A7LoopBase_cxx
 #include "A7LoopBase.h"
 #include <TH2.h>
@@ -35,5 +36,5 @@ TFile* A7LoopBase::Loop()
 }
 
 
-
+#endif
 

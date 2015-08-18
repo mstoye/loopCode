@@ -5,8 +5,8 @@
 // found on file: /afs/cern.ch/work/a/agapitos/public/CMG/CMSSW_5_3_12_patch3/src/CMGTools/TTHAnalysis/cfg/RPV_1200_500/AtoniousSUSY/SUSYLooperHistsSoftBase/SUSYLooperHistsSoftBase_tree.root
 //////////////////////////////////////////////////////////
 
-#ifndef SUSYLooperHistsSoftBase_h
-#define SUSYLooperHistsSoftBase_h
+#ifndef A7LoopBase_h
+#define A7LoopBase_h
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -395,7 +395,7 @@ public :
  
 #endif
 
-#ifdef A7LoopBase_cxx
+#ifndef A7LoopBase_cxx
 
 
 //A7LoopBase::A7LoopBase(TTree *tree) : fChain(0) 
