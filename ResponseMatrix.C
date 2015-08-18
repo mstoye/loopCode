@@ -6,6 +6,7 @@
 #include  <vector>
 #include <TF1.h>
 #include <TMath.h>
+#include <iostream>
 
 
 TFile* ResponseMatrix::Loop()
@@ -18,9 +19,9 @@ TFile* ResponseMatrix::Loop()
   Long64_t nbytes = 0, nb = 0;
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
  
-    int isGen = CutLepGenAcc();    
-    int isRECO =  CutRECO();
-    
+    //  int isGen = CutLepGenAcc();    
+    //  int isRECO =  CutRECO();
+    cout << " check "<<endl;
 
   }
   
