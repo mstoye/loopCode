@@ -15,7 +15,7 @@ TFile* ResponseMatrix::Loop()
   if (fChain == 0) return myFile;
   Long64_t nentries = fChain->GetEntriesFast();
 
-
+ 
   Long64_t nbytes = 0, nb = 0;
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
  
